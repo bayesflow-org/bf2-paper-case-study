@@ -1,0 +1,16 @@
+[project]
+name = "swp"
+version = "0.1.0"
+description = "This repository contains the replication material for the JSS submission titled 'BayesFlow 2: Multi-Backend Amortized Bayesian Inference in Python'."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bayesflow>=2.0.10",
+    "ipykernel>=7.2.0",
+    "jax[cuda13]>=0.10.0",
+    "keras>=3.14.0",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.4",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+]
