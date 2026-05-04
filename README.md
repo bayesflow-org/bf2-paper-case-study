@@ -13,8 +13,7 @@ with the JAX backend.
 The simplest way is to install all dependencies from the `pyproject.toml` using `uv`:
 
 ```bash
-uv venv
-uv sync
+uv sync --locked
 ```
 
 ## Running the Case Study
@@ -22,7 +21,7 @@ uv sync
 You can run the full case study using one of the following:
 
 ```bash
-uv run case-study.py
+uv run --locked case-study.py
 ```
 
 ```bash

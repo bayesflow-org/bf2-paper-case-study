@@ -656,22 +656,32 @@ def main():
 
     with timer("Simulating training and validation data"):
         # Simulate large dataset for offline training
-        training_data = workflow.simulate((5000,))
+        training_data = workflow.simulate((10_000,))
         # Simulate smaller dataset for validation during training
-        validation_data = workflow.simulate((300,))
+        validation_data = workflow.simulate((500,))
 
     with timer("Fitting workflow on pre-simulated data"):
         # Train the inference network
         workflow.fit_offline(
             data=training_data,
-            epochs=100,
-            batch_size=32,
+            epochs=80,
+            batch_size=64,
             validation_data=validation_data,
         )
 
+    variable_names_latex = [r"$\alpha$", r"$\beta$", r"$\gamma$", r"$\delta$"]
+
+    path = Path("e2e_diagnostics.csv")
+    with timer(f"Computing diagnostics table and saving at {path}"):
+        df = workflow.compute_default_diagnostics(
+            test_data=validation_data,
+            variable_names=variable_names_latex,
+        )
+        df.to_csv(path)
+        logging.info("Diagnostics Table:\n" + str(df))
+
     with timer(f"Plotting default diagnostics at {figures_path}/"):
         fig_size = (20, 5)
-        variable_names_latex = [r"$\alpha$", r"$\beta$", r"$\gamma$", r"$\delta$"]
         figs = workflow.plot_default_diagnostics(
             test_data=validation_data,
             variable_names=variable_names_latex,
@@ -713,7 +723,7 @@ def main():
 
     with timer("Computing posterior samples"):
         # Sample from the trained amortized posterior for later use in plots
-        estimates = workflow.sample(num_samples=300, conditions=validation_data)
+        estimates = workflow.sample(num_samples=500, conditions=validation_data)
 
     # pick a dataset that does not have significant parameter correlation
     dataset_id = 2
@@ -739,7 +749,7 @@ def main():
 
     with timer("Generating resimulations from posterior"):
         # Use posterior samples to resimulate extended trajectories
-        num_post_samples = 300
+        num_post_samples = 500
         list_of_resimulations = []
 
         posterior_draws = workflow.sample(
@@ -818,7 +828,7 @@ def main():
         expert_workflow.fit_online(
             epochs=50,
             num_batches_per_epoch=200,
-            batch_size=32,
+            batch_size=64,
         )
 
     with timer("Computing point estimates"):
@@ -865,7 +875,7 @@ def main():
             {k: v["quantiles"] for k, v in point_estimates.items()},
         )
 
-        num_post_samples = 300
+        num_post_samples = 500
 
         # Generate posterior samples from the estimated quantiles
         posterior_draws_from_quantiles = keras.tree.map_structure(
